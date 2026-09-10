@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Add Doctor{% endblock %}
+{% block content %}
+<div class="adash">
+
+  <aside class="adash-sidebar">
+    <div class="brand">🏥 HMS Admin</div>
+    <nav class="adash-nav">
+      <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('admin_dashboard') }}#doctors" class="active">Doctors</a>
+    </nav>
+    <a href="{{ url_for('logout') }}" class="logout-link">Log out</a>
+  </aside>
+
+  <main class="adash-main">
+    <div class="adash-topbar">
+      <h1>Add New Doctor</h1>
+      <a href="{{ url_for('admin_dashboard') }}" class="who">← Back to Dashboard</a>
+    </div>
+
+    <div class="card" style="max-width:640px;">
+      <form method="POST">
+        <div class="form-grid">
+          <input type="text" name="first_name" placeholder="First name" required>
+          <input type="text" name="last_name" placeholder="Last name" required>
+        </div>
+        <div class="form-grid">
+          <input type="text" name="username" placeholder="Login username" required>
+          <input type="password" name="password" placeholder="Login password" required minlength="6">
+        </div>
+        <div class="form-grid">
+          <input type="email" name="email" placeholder="Email address">
+          <input type="tel" name="phone" placeholder="Phone number">
+        </div>
+        <div class="form-grid">
+          <input type="text" name="specialization" placeholder="Specialization (e.g. Cardiologist)" required>
+          <input type="text" name="qualification" placeholder="Qualification (e.g. MBBS, MD)">
+        </div>
+        <div class="form-grid">
+          <select name="department_id">
+            <option value="">No department</option>
+            {% for dept in departments %}
+            <option value="{{ dept.department_id }}">{{ dept.department_name }}</option>
+            {% endfor %}
+          </select>
+          <input type="number" name="experience_years" placeholder="Years of experience" min="0">
+        </div>
+        <div class="field-full">
+          <input type="number" name="consultation_fee" placeholder="Consultation fee (₹)" min="0" step="1">
+        </div>
+        <button type="submit" style="padding:13px 24px; border-radius:10px; background:var(--adm); color:#fff; font-weight:700; font-size:14px;">Add Doctor</button>
+      </form>
+    </div>
+  </main>
+</div>
+{% endblock %}

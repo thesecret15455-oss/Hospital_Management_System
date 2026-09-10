@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Sign Up{% endblock %}
+{% block content %}
+<div class="login-wrap">
+  <div class="login-card" style="max-width: 520px;">
+    <h2>Create your patient account</h2>
+    <p class="sub">Sign up once to book appointments and view your records anytime.</p>
+
+    <form method="POST">
+      <div class="form-grid">
+        <input type="text" name="first_name" placeholder="First name" required>
+        <input type="text" name="last_name" placeholder="Last name" required>
+      </div>
+
+      <div class="form-grid">
+        <input type="text" name="username" placeholder="Choose a username" required>
+        <input type="password" name="password" placeholder="Choose a password" required minlength="6">
+      </div>
+
+      <div class="form-grid">
+        <input type="email" name="email" placeholder="Email address" required>
+        <input type="tel" name="phone" placeholder="Phone number" required>
+      </div>
+
+      <div class="form-grid">
+        <input type="date" name="dob" required title="Date of birth">
+        <select name="gender" required>
+          <option value="" disabled selected>Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-grid">
+        <select name="blood_group">
+          <option value="" disabled selected>Blood group</option>
+          <option>O+</option><option>O-</option>
+          <option>A+</option><option>A-</option>
+          <option>B+</option><option>B-</option>
+          <option>AB+</option><option>AB-</option>
+        </select>
+        <input type="text" name="address" placeholder="Address">
+      </div>
+
+      <div class="form-grid">
+        <input type="text" name="emergency_contact_name" placeholder="Emergency contact name">
+        <input type="tel" name="emergency_contact_phone" placeholder="Emergency contact phone">
+      </div>
+
+      <button type="submit" style="margin-top: 6px;">Create Account</button>
+    </form>
+
+    <a href="{{ url_for('login') }}" class="back-link">Already have an account? Log in</a>
+  </div>
+</div>
+{% endblock %}

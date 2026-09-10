@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Search{% endblock %}
+{% block content %}
+<div class="adash">
+
+  <aside class="adash-sidebar">
+    <div class="brand">🏥 HMS Admin</div>
+    <nav class="adash-nav">
+      <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('admin_search') }}" class="active">Patients</a>
+    </nav>
+    <a href="{{ url_for('logout') }}" class="logout-link">Log out</a>
+  </aside>
+
+  <main class="adash-main">
+    <div class="adash-topbar">
+      <h1>Search</h1>
+      <a href="{{ url_for('admin_dashboard') }}" class="who">← Back to Dashboard</a>
+    </div>
+
+    <div class="card">
+      <form method="GET" action="{{ url_for('admin_search') }}" style="display:flex; gap:12px;">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by patient name, doctor name, email, phone, status or date..."
+               style="flex:1; padding:11px 14px; border-radius:10px; border:1px solid #e3e6f0; font-size:13.5px;">
+        <button type="submit" style="padding:11px 22px; border-radius:10px; background:var(--adm); color:#fff; font-weight:600; font-size:13.5px;">Search</button>
+      </form>
+    </div>
+
+    {% if q %}
+    <div class="card">
+      <h3>Patients matching "{{ q }}" ({{ patients|length }})</h3>
+      <table class="simple-table">
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th></th></tr></thead>
+        <tbody>
+          {% for p in patients %}
+          <tr>
+            <td>{{ p.first_name }} {{ p.last_name }}</td>
+            <td>{{ p.email }}</td>
+            <td>{{ p.phone }}</td>
+            <td><a href="{{ url_for('admin_patient_detail', patient_id=p.patient_id) }}" style="color:var(--adm); font-weight:600; font-size:12.5px;">View →</a></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" style="text-align:center; color:#9297a8; padding:16px;">No matching patients.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Appointments matching "{{ q }}" ({{ appointments|length }})</h3>
+      <table class="simple-table">
+        <thead><tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          {% for a in appointments %}
+          <tr>
+            <td>{{ a.pat_fname }} {{ a.pat_lname }}</td>
+            <td>Dr. {{ a.doc_fname }} {{ a.doc_lname }}</td>
+            <td>{{ a.appointment_date }}</td>
+            <td><span class="status-pill {{ a.status }}">{{ a.status }}</span></td>
+            <td><a href="{{ url_for('admin_patient_detail', patient_id=a.patient_id) }}" style="color:var(--adm); font-weight:600; font-size:12.5px;">View Patient →</a></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" style="text-align:center; color:#9297a8; padding:16px;">No matching appointments.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p style="color:#8a8fa3; font-size:13.5px;">Enter a search term above to find patients and appointments.</p>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

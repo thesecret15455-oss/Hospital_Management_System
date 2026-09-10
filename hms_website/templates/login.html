@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Sign In{% endblock %}
+{% block content %}
+<div class="login-wrap">
+  <div class="login-card">
+    <h2>Welcome back</h2>
+    <p class="sub">Sign in to access your dashboard</p>
+    <form method="POST">
+      <input type="text" name="username" placeholder="Username" required autofocus>
+      <input type="password" name="password" placeholder="Password" required>
+      <button type="submit">Sign In</button>
+    </form>
+    <a href="{{ url_for('signup') }}" class="back-link">New patient? Create an account</a>
+    <a href="{{ url_for('index') }}" class="back-link">← Back to home</a>
+  </div>
+</div>
+{% endblock %}

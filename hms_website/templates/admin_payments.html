@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Payment Confirmations{% endblock %}
+{% block content %}
+<div class="adash">
+
+  <aside class="adash-sidebar">
+    <div class="brand">🏥 HMS Admin</div>
+    <nav class="adash-nav">
+      <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('admin_payments') }}" class="active">Payments</a>
+    </nav>
+    <a href="{{ url_for('logout') }}" class="logout-link">Log out</a>
+  </aside>
+
+  <main class="adash-main">
+    <div class="adash-topbar">
+      <h1>Payment Confirmations</h1>
+      <a href="{{ url_for('admin_dashboard') }}" class="who">← Back to Dashboard</a>
+    </div>
+
+    <div class="card">
+      <h3>Awaiting Confirmation <span style="color:#b45309;">({{ pending_confirmation|length }})</span></h3>
+      <table class="simple-table">
+        <thead><tr><th>Bill #</th><th>Patient</th><th>Amount</th><th>Method Claimed</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for b in pending_confirmation %}
+          <tr>
+            <td>#{{ b.bill_id }}</td>
+            <td>{{ b.pat_fname }} {{ b.pat_lname }}</td>
+            <td>₹{{ b.amount }}</td>
+            <td>{{ b.payment_method }}</td>
+            <td style="display:flex; gap:8px;">
+              <form method="POST" action="{{ url_for('admin_confirm_payment', bill_id=b.bill_id) }}">
+                <button type="submit" style="background:#16a34a; color:#fff; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600;">Confirm</button>
+              </form>
+              <form method="POST" action="{{ url_for('admin_reject_payment', bill_id=b.bill_id) }}"
+                    onsubmit="return confirm('Reject this payment? The bill will go back to Pending.');">
+                <button type="submit" style="background:#dc2626; color:#fff; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600;">Reject</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" style="text-align:center; color:#9297a8; padding:20px;">Nothing waiting on confirmation right now.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Recently Confirmed</h3>
+      <table class="simple-table">
+        <thead><tr><th>Bill #</th><th>Patient</th><th>Amount</th><th>Paid On</th><th>Method</th></tr></thead>
+        <tbody>
+          {% for b in recent_confirmed %}
+          <tr>
+            <td>#{{ b.bill_id }}</td>
+            <td>{{ b.pat_fname }} {{ b.pat_lname }}</td>
+            <td>₹{{ b.amount }}</td>
+            <td>{{ b.payment_date }}</td>
+            <td>{{ b.payment_method }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" style="text-align:center; color:#9297a8; padding:20px;">No confirmed payments yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+{% endblock %}

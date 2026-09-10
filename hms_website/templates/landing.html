@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Nanavati Hospital{% endblock %}
+{% block content %}
+<div class="landing">
+
+  <nav class="landing-nav">
+    <div class="brand"><span class="dot"></span> Nanavati Hospital</div>
+    <form class="search-form" method="GET" action="{{ url_for('index') }}">
+      <input type="text" name="q" placeholder="Search Doctor" value="{{ search_query or '' }}">
+      <select name="department_id" onchange="this.form.submit()">
+        <option value="">All Departments</option>
+        {% for dept in departments %}
+        <option value="{{ dept.department_id }}" {{ 'selected' if selected_department == dept.department_id|string else '' }}>
+          {{ dept.department_name }}
+        </option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn-search">Search</button>
+      {% if search_query or selected_department %}
+      <a href="{{ url_for('index') }}" class="btn-clear">Clear</a>
+      {% endif %}
+    </form>
+    {% if session.get('user_id') %}
+      <a href="{{ url_for(session.get('role').lower() + '_dashboard') }}" class="btn-signin">My Dashboard</a>
+    {% else %}
+      <a href="{{ url_for('login') }}" class="btn-signin">Sign In</a>
+    {% endif %}
+  </nav>
+
+  <div class="landing-grid">
+    <!-- Sidebar info -->
+    <div>
+      <div class="side-card">
+        <h2>Nanavati Hospital</h2>
+        <p class="tag">Community Hospitals<br>(Nonfederal Acute Care)</p>
+        <div class="social-row">
+          <a href="#">f</a><a href="#">t</a><a href="#">in</a>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <h2 style="font-size:16px; display:flex; align-items:center; gap:8px;">🕐 Opening Hours</h2>
+        <div class="hours-row"><span class="day">Monday to Friday</span><span class="time">8:00 AM - 7:00 PM</span></div>
+        <div class="hours-row"><span class="day">Saturday</span><span class="time">9:00 AM - 2:00 PM</span></div>
+        <div class="hours-row"><span class="day">Sunday</span><span class="time">9:00 AM - 2:00 PM</span></div>
+      </div>
+
+      <div class="benefit-badge">
+        <div class="num">{{ doctors|length * 40 }}+</div>
+        <div class="label">Patients Benefits</div>
+      </div>
+    </div>
+
+    <!-- Doctors + Booking -->
+    <div>
+      {% if search_query or selected_department %}
+      <p class="results-meta">
+        {{ doctors|length }} doctor{{ 's' if doctors|length != 1 else '' }} found
+        {% if search_query %} for "{{ search_query }}"{% endif %}
+      </p>
+      {% endif %}
+
+      <div class="doctor-strip">
+        {% for doc in doctors %}
+        <div class="doctor-card {{ 'active' if loop.first else '' }}" data-doctor-id="{{ doc.doctor_id }}" onclick="selectDoctor(this)">
+          <div class="avatar">{{ doc.first_name[0] }}{{ doc.last_name[0] }}</div>
+          <div>
+            <div class="name">{{ doc.first_name }} {{ doc.last_name }}</div>
+            <div class="spec">{{ doc.specialization }}</div>
+          </div>
+        </div>
+        {% else %}
+        <p class="no-results">No doctors match your search. Try a different name, specialization, or department.</p>
+        {% endfor %}
+      </div>
+
+      <div class="booking-panel">
+        <h3>Book an Appointment</h3>
+        <p class="desc">Please feel welcome to contact our friendly reception staff with any general or medical enquiry. Our doctor will receive or return any urgent calls.</p>
+
+        <div class="toggle-row">
+          <button type="button" class="active">Online Consultation</button>
+          <button type="button">Offline Consultation</button>
+        </div>
+
+        <form method="POST" action="{{ url_for('book_appointment') }}">
+          <input type="hidden" name="doctor_id" id="selected-doctor-id" value="{{ doctors[0].doctor_id if doctors else '' }}">
+          <div class="form-grid">
+            <input type="date" name="date" required>
+            <input type="time" name="time" required>
+          </div>
+          <div class="field-full">
+            <textarea name="symptoms" rows="3" placeholder="Enter Symptoms"></textarea>
+          </div>
+          <button type="submit" class="btn-book">Book Appointment</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function selectDoctor(el) {
+  document.querySelectorAll('.doctor-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('selected-doctor-id').value = el.dataset.doctorId;
+}
+</script>
+{% endblock %}

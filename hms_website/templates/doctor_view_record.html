@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Medical Record{% endblock %}
+{% block content %}
+<div class="adash">
+
+  <aside class="adash-sidebar">
+    <div class="brand">🏥 HMS Doctor</div>
+    <nav class="adash-nav">
+      <a href="{{ url_for('doctor_dashboard') }}#appointments" class="active">My Appointments</a>
+    </nav>
+    <a href="{{ url_for('logout') }}" class="logout-link">Log out</a>
+  </aside>
+
+  <main class="adash-main">
+    <div class="adash-topbar">
+      <h1>{{ record.pat_fname }} {{ record.pat_lname }}</h1>
+      <a href="{{ url_for('doctor_dashboard') }}#appointments" class="who">← Back to Appointments</a>
+    </div>
+
+    <div class="card">
+      <h3>Diagnosis</h3>
+      <p style="font-size:14px; margin-bottom:14px;">{{ record.diagnosis }}</p>
+
+      <h3>Treatment</h3>
+      <p style="font-size:14px; margin-bottom:14px;">{{ record.treatment or '—' }}</p>
+
+      <h3>Notes</h3>
+      <p style="font-size:14px; color:#5b6072;">{{ record.notes or '—' }}</p>
+    </div>
+
+    <div class="card">
+      <h3>Prescriptions</h3>
+      <table class="simple-table">
+        <thead><tr><th>Medicine</th><th>Dosage</th><th>Duration</th><th>Instructions</th></tr></thead>
+        <tbody>
+          {% for p in prescriptions %}
+          <tr>
+            <td>{{ p.medicine_name }}</td>
+            <td>{{ p.dosage }}</td>
+            <td>{{ p.duration }}</td>
+            <td>{{ p.instructions }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" style="text-align:center; color:#9297a8; padding:16px;">No prescription was added for this record.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+{% endblock %}

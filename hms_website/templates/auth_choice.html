@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Login or Sign Up{% endblock %}
+{% block content %}
+<div class="login-wrap">
+  <div class="login-card" style="max-width: 420px; text-align: center;">
+    <h2>Almost there</h2>
+    <p class="sub">You'll need a patient account to book an appointment — it only takes a minute.</p>
+
+    <a href="{{ url_for('signup') }}" class="btn-book" style="display:block; margin-bottom: 12px; text-decoration:none;">
+      I'm a new patient — Sign Up
+    </a>
+    <a href="{{ url_for('login') }}" style="display:block; padding: 14px; border-radius: 12px; background: var(--ind-light); color: var(--ind-dark); font-weight: 700; font-size: 14.5px; text-decoration:none;">
+      I already have an account — Log In
+    </a>
+
+    <a href="{{ url_for('index') }}" class="back-link">← Back to home</a>
+  </div>
+</div>
+{% endblock %}

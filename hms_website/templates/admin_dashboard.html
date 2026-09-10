@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="adash">
+
+  <aside class="adash-sidebar">
+    <div class="brand">🏥 HMS Admin</div>
+    <nav class="adash-nav">
+      <a href="#" class="active">Dashboard</a>
+      <a href="#doctors">Doctors</a>
+      <a href="#appointments">Appointments</a>
+      <a href="{{ url_for('admin_search') }}">Patients</a>
+      <a href="{{ url_for('admin_payments') }}">Payments</a>
+    </nav>
+    <a href="{{ url_for('logout') }}" class="logout-link">Log out</a>
+  </aside>
+
+  <main class="adash-main">
+    <div class="adash-topbar">
+      <h1>Dashboard</h1>
+      <div class="who">Signed in as {{ session.get('display_name') }} (Admin)</div>
+    </div>
+
+    <div class="card" style="margin-bottom:22px;">
+      <form method="GET" action="{{ url_for('admin_search') }}" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+        <input type="text" name="q" placeholder="Search appointments, patients by name, email or phone..."
+               style="flex:1; min-width:220px; padding:11px 14px; border-radius:10px; border:1px solid #e3e6f0; font-size:13.5px;">
+        <button type="submit" style="padding:11px 20px; border-radius:10px; background:var(--adm); color:#fff; font-weight:600; font-size:13.5px;">Search</button>
+      </form>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card"><div class="icon">🧑‍🤝‍🧑</div><div class="num">{{ stats.patients }}</div><div class="label">Total Patients</div></div>
+      <div class="kpi-card"><div class="icon">🩺</div><div class="num">{{ stats.doctors }}</div><div class="label">Total Doctors</div></div>
+      <div class="kpi-card"><div class="icon">📅</div><div class="num">{{ stats.appointments }}</div><div class="label">Appointments</div></div>
+      <a href="{{ url_for('admin_payments') }}" class="kpi-card" style="text-decoration:none; color:inherit; display:block; {{ 'border-color:#f59e0b; background:#fffbeb;' if stats.pending_payments > 0 else '' }}">
+        <div class="icon">💳</div><div class="num">{{ stats.pending_payments }}</div><div class="label">Payments Awaiting Confirmation</div>
+      </a>
+    </div>
+
+    <div class="adash-grid">
+      <div>
+        <div class="card" id="appointments">
+          <h3>Recent Appointments</h3>
+          <table class="simple-table">
+            <thead><tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody>
+              {% for a in recent_appointments %}
+              <tr>
+                <td>{{ a.pat_fname }} {{ a.pat_lname }}</td>
+                <td>Dr. {{ a.doc_fname }} {{ a.doc_lname }}</td>
+                <td>{{ a.appointment_date }}</td>
+                <td><span class="status-pill {{ a.status }}">{{ a.status }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3>Appointment Status Breakdown</h3>
+          {% set max_c = (status_counts | map(attribute='c') | list | max) if status_counts else 1 %}
+          {% for s in status_counts %}
+          <div class="bar-row">
+            <div class="bar-label">{{ s.status }}</div>
+            <div class="bar-track"><div class="bar-fill" style="width: {{ (s.c / max_c * 100) | round }}%;"></div></div>
+            <div class="bar-val">{{ s.c }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div>
+        <div class="card" id="doctors">
+          <h3 style="display:flex; justify-content:space-between; align-items:center;">
+            Doctor List
+            <a href="{{ url_for('admin_add_doctor') }}" style="font-size:12.5px; background:var(--adm); color:#fff; padding:6px 12px; border-radius:8px; font-weight:600;">+ Add Doctor</a>
+          </h3>
+          {% for d in doctors %}
+          <div class="doclist-item">
+            <a href="{{ url_for('admin_doctor_detail', doctor_id=d.doctor_id) }}" style="display:flex; align-items:center; gap:10px; flex:1;">
+              <div class="avatar">{{ d.first_name[0] }}{{ d.last_name[0] }}</div>
+              <div>
+                <div class="name">Dr. {{ d.first_name }} {{ d.last_name }}</div>
+                <div class="spec">{{ d.specialization }}</div>
+              </div>
+            </a>
+            <form method="POST" action="{{ url_for('admin_delete_doctor', doctor_id=d.doctor_id) }}"
+                  onsubmit="return confirm('Remove Dr. {{ d.first_name }} {{ d.last_name }}? This also removes their appointments and records.');">
+              <button type="submit" style="background:none; color:#dc2626; font-size:12px; font-weight:600; padding:4px 8px;">Remove</button>
+            </form>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="card">
+          <h3>Billing Summary</h3>
+          {% for r in revenue %}
+          <div class="bar-row">
+            <div class="bar-label">{{ r.payment_status }}</div>
+            <div class="bar-track"><div class="bar-fill" style="width: 70%;"></div></div>
+            <div class="bar-val">₹{{ r.total }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}{{ patient.first_name }} {{ patient.last_name }}{% endblock %}
+{% block content %}
+<div class="adash">
+
+  <aside class="adash-sidebar">
+    <div class="brand">🏥 HMS Admin</div>
+    <nav class="adash-nav">
+      <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('admin_search') }}" class="active">Patients</a>
+    </nav>
+    <a href="{{ url_for('logout') }}" class="logout-link">Log out</a>
+  </aside>
+
+  <main class="adash-main">
+    <div class="adash-topbar">
+      <h1>{{ patient.first_name }} {{ patient.last_name }}</h1>
+      <a href="{{ url_for('admin_search') }}" class="who">← Back to Search</a>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card"><div class="icon">📧</div><div class="num" style="font-size:14px;">{{ patient.email }}</div><div class="label">Email</div></div>
+      <div class="kpi-card"><div class="icon">📞</div><div class="num" style="font-size:14px;">{{ patient.phone }}</div><div class="label">Phone</div></div>
+      <div class="kpi-card"><div class="icon">🩸</div><div class="num" style="font-size:14px;">{{ patient.blood_group or '—' }}</div><div class="label">Blood Group</div></div>
+      <div class="kpi-card"><div class="icon">🎂</div><div class="num" style="font-size:14px;">{{ patient.dob }}</div><div class="label">Date of Birth</div></div>
+    </div>
+
+    <div class="adash-grid">
+      <div>
+        <div class="card">
+          <h3>Appointments ({{ appointments|length }})</h3>
+          <table class="simple-table">
+            <thead><tr><th>Doctor</th><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+            <tbody>
+              {% for a in appointments %}
+              <tr>
+                <td>Dr. {{ a.doc_fname }} {{ a.doc_lname }}</td>
+                <td>{{ a.appointment_date }}</td>
+                <td>{{ a.appointment_time }}</td>
+                <td><span class="status-pill {{ a.status }}">{{ a.status }}</span></td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" style="text-align:center; color:#9297a8; padding:16px;">No appointments.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3>Billing ({{ bills|length }})</h3>
+          <table class="simple-table">
+            <thead><tr><th>Bill #</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody>
+              {% for b in bills %}
+              <tr>
+                <td>#{{ b.bill_id }}</td>
+                <td>₹{{ b.amount }}</td>
+                <td><span class="status-pill {{ b.payment_status|replace(' ', '') }}">{{ b.payment_status }}</span></td>
+                <td>{{ b.payment_date or '—' }}</td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" style="text-align:center; color:#9297a8; padding:16px;">No billing records.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h3>Medical Records</h3>
+          {% for r in records %}
+          <div class="doclist-item" style="display:block;">
+            <div class="name">{{ r.diagnosis }}</div>
+            <div class="spec">Dr. {{ r.doc_fname }} {{ r.doc_lname }} · {{ r.record_date }}</div>
+          </div>
+          {% else %}
+          <p style="color:#8a8fa3; font-size:13px;">No medical records.</p>
+          {% endfor %}
+        </div>
+
+        <div class="card">
+          <h3>Address</h3>
+          <p style="font-size:13.5px; color:#5b6072;">{{ patient.address or 'Not provided' }}</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}

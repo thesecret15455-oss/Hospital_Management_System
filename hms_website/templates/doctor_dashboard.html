@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Doctor Dashboard{% endblock %}
+{% block content %}
+<div class="adash">
+
+  <aside class="adash-sidebar">
+    <div class="brand">🏥 HMS Doctor</div>
+    <nav class="adash-nav">
+      <a href="#appointments" class="active">My Appointments</a>
+      <a href="#schedule">My Schedule</a>
+    </nav>
+    <a href="{{ url_for('logout') }}" class="logout-link">Log out</a>
+  </aside>
+
+  <main class="adash-main">
+    <div class="adash-topbar">
+      <h1>Welcome, Dr. {{ doctor.first_name }} {{ doctor.last_name }}</h1>
+      <div class="who">{{ doctor.specialization }}</div>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card"><div class="icon">📅</div><div class="num">{{ total }}</div><div class="label">Total Appointments</div></div>
+      <div class="kpi-card"><div class="icon">⏳</div><div class="num">{{ scheduled }}</div><div class="label">Scheduled</div></div>
+      <div class="kpi-card"><div class="icon">✅</div><div class="num">{{ completed }}</div><div class="label">Completed</div></div>
+      <div class="kpi-card"><div class="icon">💰</div><div class="num">₹{{ doctor.consultation_fee }}</div><div class="label">Consultation Fee</div></div>
+    </div>
+
+    <div class="adash-grid">
+      <div>
+        <div class="card" id="appointments">
+          <h3>My Appointments</h3>
+          <table class="simple-table">
+            <thead><tr><th>Patient</th><th>Date</th><th>Time</th><th>Reason</th><th>Status</th><th>Update</th><th>Record</th></tr></thead>
+            <tbody>
+              {% for a in appointments %}
+              <tr>
+                <td>{{ a.pat_fname }} {{ a.pat_lname }}</td>
+                <td>{{ a.appointment_date }}</td>
+                <td>{{ a.appointment_time }}</td>
+                <td>{{ a.reason_for_visit }}</td>
+                <td><span class="status-pill {{ a.status }}">{{ a.status }}</span></td>
+                <td>
+                  <form method="POST" action="{{ url_for('doctor_update_appointment', appointment_id=a.appointment_id) }}" style="display:flex; gap:6px;">
+                    <select name="status" style="padding:6px 8px; border-radius:8px; border:1px solid #e3e6f0; font-size:12px;">
+                      <option value="Scheduled" {{ 'selected' if a.status == 'Scheduled' else '' }}>Scheduled</option>
+                      <option value="Completed" {{ 'selected' if a.status == 'Completed' else '' }}>Completed</option>
+                      <option value="Cancelled" {{ 'selected' if a.status == 'Cancelled' else '' }}>Cancelled</option>
+                    </select>
+                    <button type="submit" style="background:var(--adm); color:#fff; padding:6px 10px; border-radius:8px; font-size:11.5px; font-weight:600;">Save</button>
+                  </form>
+                </td>
+                <td>
+                  {% if a.record_id %}
+                  <a href="{{ url_for('doctor_view_record', record_id=a.record_id) }}" style="color:var(--adm); font-weight:600; font-size:12px;">View Record</a>
+                  {% else %}
+                  <a href="{{ url_for('doctor_add_record', appointment_id=a.appointment_id) }}" style="color:#16a34a; font-weight:600; font-size:12px;">+ Add Record</a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="7" style="text-align:center; color:#9297a8; padding:20px;">No appointments yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" id="schedule">
+          <h3>My Weekly Schedule</h3>
+          {% for s in schedule %}
+          <div class="doclist-item">
+            <div class="avatar">{{ s.day_of_week }}</div>
+            <div>
+              <div class="name">{{ s.day_of_week }}</div>
+              <div class="spec">{{ s.start_time }} – {{ s.end_time }}</div>
+            </div>
+          </div>
+          {% else %}
+          <p style="color:#8a8fa3; font-size:13px;">No schedule set.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Dr. {{ doctor.first_name }} {{ doctor.last_name }}{% endblock %}
+{% block content %}
+<div class="adash">
+
+  <aside class="adash-sidebar">
+    <div class="brand">🏥 HMS Admin</div>
+    <nav class="adash-nav">
+      <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('admin_dashboard') }}#doctors" class="active">Doctors</a>
+    </nav>
+    <a href="{{ url_for('logout') }}" class="logout-link">Log out</a>
+  </aside>
+
+  <main class="adash-main">
+    <div class="adash-topbar">
+      <h1>Dr. {{ doctor.first_name }} {{ doctor.last_name }}</h1>
+      <a href="{{ url_for('admin_dashboard') }}" class="who">← Back to Dashboard</a>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card"><div class="icon">🩺</div><div class="num" style="font-size:15px;">{{ doctor.specialization }}</div><div class="label">Specialization</div></div>
+      <div class="kpi-card"><div class="icon">🏢</div><div class="num" style="font-size:15px;">{{ doctor.department_name or '—' }}</div><div class="label">Department</div></div>
+      <div class="kpi-card"><div class="icon">🎓</div><div class="num" style="font-size:15px;">{{ doctor.experience_years }} yrs</div><div class="label">Experience</div></div>
+      <div class="kpi-card"><div class="icon">💰</div><div class="num">₹{{ doctor.consultation_fee }}</div><div class="label">Consultation Fee</div></div>
+    </div>
+
+    <div class="card">
+      <h3>5 Most Recent Appointments</h3>
+      <table class="simple-table">
+        <thead><tr><th>Patient</th><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for a in appointments %}
+          <tr>
+            <td>{{ a.pat_fname }} {{ a.pat_lname }}</td>
+            <td>{{ a.appointment_date }}</td>
+            <td>{{ a.appointment_time }}</td>
+            <td><span class="status-pill {{ a.status }}">{{ a.status }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" style="text-align:center; color:#9297a8; padding:20px;">No appointments yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin_delete_doctor', doctor_id=doctor.doctor_id) }}"
+          onsubmit="return confirm('Remove Dr. {{ doctor.first_name }} {{ doctor.last_name }}? This also removes their appointments and records.');">
+      <button type="submit" style="background:#dc2626; color:#fff; padding:11px 20px; border-radius:10px; font-weight:600; font-size:13.5px;">Remove This Doctor</button>
+    </form>
+  </main>
+</div>
+{% endblock %}

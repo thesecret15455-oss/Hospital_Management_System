@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Patient Dashboard{% endblock %}
+{% block content %}
+<div class="pdash">
+
+  <aside class="pdash-sidebar">
+    <div class="brand"><span class="dot"></span> HealthCare</div>
+    <nav class="pdash-nav">
+      <a href="#" class="active">🏠 Overview</a>
+      <a href="#appointments">📅 Appointments</a>
+      <a href="#records">📋 Medical Records</a>
+      <a href="#prescriptions">💊 Prescriptions</a>
+      <a href="#billing">💳 Billing</a>
+      <a href="{{ url_for('index') }}">🩺 Book New Visit</a>
+    </nav>
+    <div class="logout-box">
+      <div style="font-size:13px; font-weight:700;">Need help?</div>
+      <a href="{{ url_for('logout') }}">Log out</a>
+    </div>
+  </aside>
+
+  <main class="pdash-main">
+    <div class="pdash-topbar">
+      <div>
+        <h1>Good day, {{ patient.first_name }}!</h1>
+        <p>Here's what's happening with your health</p>
+      </div>
+      <div class="avatar-chip">
+        <div class="circle">{{ patient.first_name[0] }}{{ patient.last_name[0] }}</div>
+        <span style="font-size:13.5px; font-weight:600;">{{ patient.first_name }} {{ patient.last_name }}</span>
+      </div>
+    </div>
+
+    <div class="hero-banner">
+      <div>
+        <h2>Track your health journey, all in one place</h2>
+        <p>View appointments, medical records, prescriptions and billing — updated in real time.</p>
+      </div>
+      <div class="deco">🩺</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-tile"><div class="label">Upcoming Appointments</div><div class="val">{{ upcoming_count }}</div></div>
+      <div class="stat-tile"><div class="label">Completed Visits</div><div class="val">{{ completed_count }}</div></div>
+      <div class="stat-tile"><div class="label">Medical Records</div><div class="val">{{ records|length }}</div></div>
+      <div class="stat-tile"><div class="label">Pending Bills</div><div class="val">{{ pending_bills }}</div></div>
+    </div>
+
+    <div class="pdash-columns">
+      <div>
+        <div class="panel" id="appointments">
+          <h3>My Appointments <span class="count-pill">{{ appointments|length }} total</span></h3>
+          <table class="pdash-table">
+            <thead>
+              <tr><th>Doctor</th><th>Specialization</th><th>Date</th><th>Time</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              {% for a in appointments %}
+              <tr>
+                <td>Dr. {{ a.doc_fname }} {{ a.doc_lname }}</td>
+                <td>{{ a.specialization }}</td>
+                <td>{{ a.appointment_date }}</td>
+                <td>{{ a.appointment_time }}</td>
+                <td><span class="status-pill {{ a.status }}">{{ a.status }}</span></td>
+              </tr>
+              {% else %}
+              <tr><td colspan="5" style="text-align:center; color:#9297a8; padding:20px;">No appointments yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel" id="billing">
+          <h3>Billing History <span class="count-pill">{{ bills|length }} total</span></h3>
+          <table class="pdash-table">
+            <thead>
+              <tr><th>Bill #</th><th>Amount</th><th>Status</th><th>Payment Date</th><th>Method</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              {% for b in bills %}
+              <tr>
+                <td>#{{ b.bill_id }}</td>
+                <td>₹{{ b.amount }}</td>
+                <td><span class="status-pill {{ b.payment_status|replace(' ', '') }}">{{ b.payment_status }}</span></td>
+                <td>{{ b.payment_date or '—' }}</td>
+                <td>{{ b.payment_method or '—' }}</td>
+                <td>
+                  {% if b.payment_status == 'Pending' %}
+                  <form method="POST" action="{{ url_for('pay_bill', bill_id=b.bill_id) }}" style="display:flex; gap:6px;">
+                    <select name="payment_method" style="padding:6px 8px; border-radius:8px; border:1px solid #e5e7f0; font-size:12px;">
+                      <option value="Card">Card</option>
+                      <option value="UPI">UPI</option>
+                      <option value="Cash">Cash</option>
+                    </select>
+                    <button type="submit" style="background:var(--ind); color:#fff; padding:6px 12px; border-radius:8px; font-size:11.5px; font-weight:700;">Pay Now</button>
+                  </form>
+                  {% elif b.payment_status == 'Awaiting Confirmation' %}
+                  <span style="color:#b45309; font-size:12px; font-weight:600;">Awaiting admin confirmation</span>
+                  {% else %}
+                  <span style="color:#9297a8; font-size:12px;">—</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="6" style="text-align:center; color:#9297a8; padding:20px;">No billing records.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel" id="records">
+          <h3>Medical Records <span class="count-pill">{{ records|length }} total</span></h3>
+          {% for r in records %}
+          <div class="record-item">
+            <div class="diag">{{ r.diagnosis }}</div>
+            <div class="meta">Dr. {{ r.doc_fname }} {{ r.doc_lname }} · {{ r.record_date }}</div>
+            {% if r.treatment %}<div style="font-size:12.5px; color:#5a6072; margin-top:4px;">Treatment: {{ r.treatment }}</div>{% endif %}
+            {% if r.notes %}<div style="font-size:12px; color:#9297a8; margin-top:2px;">{{ r.notes }}</div>{% endif %}
+          </div>
+          {% else %}
+          <p style="color:#9297a8; font-size:13.5px;">No medical records on file yet. These appear here once a doctor completes your appointment.</p>
+          {% endfor %}
+        </div>
+
+        <div class="panel" id="prescriptions">
+          <h3>Prescriptions <span class="count-pill">{{ prescriptions|length }} total</span></h3>
+          {% for p in prescriptions %}
+          <div class="record-item">
+            <div class="diag">{{ p.medicine_name }}</div>
+            <div class="meta">{{ p.dosage }} · {{ p.duration }}</div>
+            {% if p.instructions %}<div style="font-size:12px; color:#9297a8; margin-top:2px;">{{ p.instructions }}</div>{% endif %}
+            <div style="font-size:11.5px; color:#b5b9c8; margin-top:4px;">For: {{ p.diagnosis }} — Dr. {{ p.doc_fname }} {{ p.doc_lname }}</div>
+          </div>
+          {% else %}
+          <p style="color:#9297a8; font-size:13.5px;">No prescriptions on file yet.</p>
+          {% endfor %}
+        </div>
+
+        <div class="panel">
+          <h3>Quick Actions</h3>
+          <a href="{{ url_for('index') }}" class="btn-book" style="display:block; text-align:center; text-decoration:none; margin-bottom:10px;">Book New Appointment</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
