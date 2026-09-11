@@ -20,14 +20,15 @@ _pool = pooling.MySQLConnectionPool(
 def get_connection():
     return _pool.get_connection()
 
-def query(sql, params=None):
+def query(sql, params=None, fetchone=False):
     """Helper function to execute SELECT queries and return dictionary records."""
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute(sql, params or ())
-        result = cursor.fetchall()
-        return result
+        if fetchone:
+            return cursor.fetchone()
+        return cursor.fetchall()
     finally:
         cursor.close()
         conn.close()
