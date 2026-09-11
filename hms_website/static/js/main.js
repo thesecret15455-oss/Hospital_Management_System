@@ -44,3 +44,43 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+// Mobile off-canvas sidebar for the Patient / Admin / Doctor dashboards.
+// Injects a hamburger button + dimming overlay so the fixed sidebar can be
+// slid in/out on small screens instead of squeezing the layout.
+document.addEventListener("DOMContentLoaded", function () {
+  var sidebar = document.querySelector(".pdash-sidebar, .adash-sidebar");
+  var root = document.querySelector(".pdash, .adash");
+  if (!sidebar || !root) return;
+
+  var toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "sidebar-toggle";
+  toggle.setAttribute("aria-label", "Toggle menu");
+  toggle.textContent = "☰";
+  root.appendChild(toggle);
+
+  var overlay = document.createElement("div");
+  overlay.className = "sidebar-overlay";
+  root.appendChild(overlay);
+
+  function closeSidebar() {
+    sidebar.classList.remove("open");
+    overlay.classList.remove("show");
+  }
+
+  toggle.addEventListener("click", function () {
+    var isOpen = sidebar.classList.toggle("open");
+    overlay.classList.toggle("show", isOpen);
+  });
+
+  overlay.addEventListener("click", closeSidebar);
+
+  sidebar.querySelectorAll("a").forEach(function (a) {
+    a.addEventListener("click", closeSidebar);
+  });
+
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 880) closeSidebar();
+  });
+});

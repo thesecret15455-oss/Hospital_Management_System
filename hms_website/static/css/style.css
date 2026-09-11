@@ -271,3 +271,102 @@ table.simple-table td { padding: 10px 8px; border-bottom: 1px solid #f4f5fa; }
 .login-card input:focus { outline: none; border-color: var(--ind); }
 .login-card button { width: 100%; padding: 14px; border-radius: 12px; background: var(--ind); color: #fff; font-weight: 700; font-size: 14.5px; }
 .login-card .back-link { display: block; text-align: center; margin-top: 16px; font-size: 13px; color: #8a8fa3; }
+
+/* =========================================================
+   GLOBAL RESPONSIVE FIXES
+   ========================================================= */
+html { -webkit-text-size-adjust: 100%; }
+body { overflow-x: hidden; }
+img, svg { max-width: 100%; }
+
+/* ---- Landing nav: brand+signin together, search bar full-width row ---- */
+.landing-nav-top { display: contents; }
+
+@media (max-width: 700px) {
+  .landing-nav { flex-direction: column; align-items: stretch; gap: 12px; }
+  .landing-nav-top {
+    display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 12px;
+  }
+  .landing-nav .brand { margin-right: 0; font-size: 17px; }
+  .landing-nav .btn-signin { flex-shrink: 0; padding: 10px 16px; font-size: 13px; }
+  .landing-nav .search-form { width: 100%; flex-direction: column; align-items: stretch; gap: 10px; }
+  .landing-nav .search-form input,
+  .landing-nav .search-form select,
+  .landing-nav .btn-search { width: 100%; }
+  .landing-nav .btn-clear { text-align: center; }
+}
+
+/* ---- Landing page: show doctors + booking before the sidebar info on mobile ---- */
+@media (max-width: 880px) {
+  .landing-grid > .doctors-col { order: 1; }
+  .landing-grid > .side-info { order: 2; margin-top: 20px; }
+}
+
+@media (max-width: 480px) {
+  .landing { padding: 18px 4vw 40px; }
+  .side-card, .booking-panel { padding: 18px; }
+  .booking-panel h3 { font-size: 18px; }
+  .doctor-card .name { font-size: 13px; }
+  .doctor-card .spec { font-size: 11px; }
+}
+
+@media (max-width: 420px) {
+  .doctor-strip { grid-template-columns: 1fr; }
+}
+
+/* ---- Dashboard sidebars (patient/admin/doctor): off-canvas on mobile ---- */
+.sidebar-toggle {
+  display: none;
+  position: fixed; top: 14px; left: 14px; z-index: 1100;
+  width: 42px; height: 42px; border-radius: 10px; background: #fff; border: 1px solid #eceef5;
+  box-shadow: 0 6px 18px rgba(0,0,0,.15); font-size: 19px; align-items: center; justify-content: center;
+}
+.sidebar-overlay {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,20,30,.45); z-index: 1000;
+}
+.sidebar-overlay.show { display: block; }
+
+@media (max-width: 880px) {
+  .pdash, .adash { flex-direction: column; }
+  .pdash-sidebar, .adash-sidebar {
+    position: fixed; top: 0; left: 0; height: 100vh; width: 250px; max-width: 82vw;
+    z-index: 1050; transform: translateX(-100%); transition: transform .25s ease;
+    overflow-y: auto;
+  }
+  .pdash-sidebar.open, .adash-sidebar.open { transform: translateX(0); }
+  .pdash-main, .adash-main { padding: 76px 16px 30px; width: 100%; }
+  .sidebar-toggle { display: flex; }
+}
+
+/* ---- Tables: scroll horizontally instead of squishing on small screens ---- */
+@media (max-width: 700px) {
+  .panel, .card { overflow-x: auto; }
+  table.pdash-table, table.simple-table { min-width: 560px; }
+}
+
+/* ---- Topbars / hero / grids stack cleanly on mobile ---- */
+@media (max-width: 640px) {
+  .pdash-topbar, .adash-topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .hero-banner { flex-direction: column; align-items: flex-start; text-align: left; gap: 10px; padding: 22px; }
+  .hero-banner .deco { display: none; }
+  .hero-banner h2 { font-size: 20px; max-width: 100%; }
+  .hero-banner p { max-width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .stat-row, .kpi-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pdash-main, .adash-main { padding: 76px 12px 24px; }
+  .panel, .card { padding: 16px; }
+  .avatar-chip span { display: none; }
+  .bar-row .bar-label { width: 64px; font-size: 11.5px; }
+}
+
+@media (max-width: 360px) {
+  .stat-row, .kpi-row { grid-template-columns: 1fr; }
+}
+
+/* ---- Login / signup / auth-choice cards ---- */
+@media (max-width: 480px) {
+  .login-card { padding: 26px 22px; }
+  .login-wrap { padding: 14px; }
+}

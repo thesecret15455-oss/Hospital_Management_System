@@ -4,7 +4,14 @@
 <div class="landing">
 
   <nav class="landing-nav">
-    <div class="brand"><span class="dot"></span> Nanavati Hospital</div>
+    <div class="landing-nav-top">
+      <div class="brand"><span class="dot"></span> Nanavati Hospital</div>
+      {% if session.get('user_id') %}
+        <a href="{{ url_for(session.get('role').lower() + '_dashboard') }}" class="btn-signin">My Dashboard</a>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="btn-signin">Sign In</a>
+      {% endif %}
+    </div>
     <form class="search-form" method="GET" action="{{ url_for('index') }}">
       <input type="text" name="q" placeholder="Search Doctor" value="{{ search_query or '' }}">
       <select name="department_id" onchange="this.form.submit()">
@@ -20,16 +27,11 @@
       <a href="{{ url_for('index') }}" class="btn-clear">Clear</a>
       {% endif %}
     </form>
-    {% if session.get('user_id') %}
-      <a href="{{ url_for(session.get('role').lower() + '_dashboard') }}" class="btn-signin">My Dashboard</a>
-    {% else %}
-      <a href="{{ url_for('login') }}" class="btn-signin">Sign In</a>
-    {% endif %}
   </nav>
 
   <div class="landing-grid">
     <!-- Sidebar info -->
-    <div>
+    <div class="side-info">
       <div class="side-card">
         <h2>Nanavati Hospital</h2>
         <p class="tag">Community Hospitals<br>(Nonfederal Acute Care)</p>
@@ -52,7 +54,7 @@
     </div>
 
     <!-- Doctors + Booking -->
-    <div>
+    <div class="doctors-col">
       {% if search_query or selected_department %}
       <p class="results-meta">
         {{ doctors|length }} doctor{{ 's' if doctors|length != 1 else '' }} found
