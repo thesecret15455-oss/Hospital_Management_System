@@ -2,14 +2,13 @@ import os
 import mysql.connector
 from mysql.connector import pooling
 
-# Reads credentials from Render Environment Variables (falls back to Aiven defaults)
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "mysql-304b94a4-hospital-management-system-1545.a.aivencloud.com"),
     "port": int(os.getenv("DB_PORT", 16621)),
     "user": os.getenv("DB_USER", "avnadmin"),
     "password": os.getenv("DB_PASSWORD", "AVNS_aNBqmcF2-ZY3M837-pW"),
     "database": os.getenv("DB_NAME", "defaultdb"),
-    "ssl_disabled": False  # Enforces SSL required by Aiven
+    "ssl_disabled": False
 }
 
 _pool = pooling.MySQLConnectionPool(
@@ -29,6 +28,18 @@ def query(sql, params=None):
         cursor.execute(sql, params or ())
         result = cursor.fetchall()
         return result
+    finally:
+        cursor.close()
+        conn.close()
+
+def execute(sql, params=None):
+    """Helper function to execute INSERT/UPDATE/DELETE queries."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(sql, params or ())
+        conn.commit()
+        return cursor.lastrowid
     finally:
         cursor.close()
         conn.close()
